@@ -6,9 +6,12 @@ using Microsoft.EntityFrameworkCore;
 using PizzaStore.Models;
 
 var builder = WebApplication.CreateBuilder(args);
+//Database connection string
+var connectionString = builder.Configuration.GetConnectionString("Pizzas") ?? "Data Source=Pizzas.db";
 
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddDbContext<PizzaDb>(options => options.UseInMemoryDatabase("items"));
+//Adding SQLlite connection context to services
+builder.Services.AddSqlite<PizzaDb>(connectionString);
 //
 builder.Services.AddSwaggerGen(c =>
 {
@@ -48,6 +51,16 @@ app.MapPut("/pizza/{id}", async (PizzaDb db, Pizza updatepizza, int id) =>
 });
 
 //Delete Pizza
-
+app.MapDelete("/pizza/{id}", async (PizzaDb db, int id) =>
+{
+  var pizza = await db.Pizzas.FindAsync(id);
+  if (pizza is null)
+  {
+    return Results.NotFound();
+  }
+  db.Pizzas.Remove(pizza);
+  await db.SaveChangesAsync();
+  return Results.Ok();
+});
 //For Running the application
 app.Run();
