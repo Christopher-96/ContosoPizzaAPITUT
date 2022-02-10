@@ -34,7 +34,6 @@ public class PizzaController : ControllerBase
     return CreatedAtAction(nameof(Create), new { id = pizza.Id }, pizza);
 }
           
-    // This code will save the pizza and return a result
 
 
     [HttpPut("{id}")]
